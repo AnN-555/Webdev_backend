@@ -25,7 +25,7 @@ async function importGames() {
     .map((d) => d.name);
 
   let imported = 0,
-    update =0;
+    updated = 0,
     skipped = 0,
     errors = 0;
 
@@ -65,13 +65,23 @@ async function importGames() {
         if (!Number.isNaN(num) && num >= 0) price = num;
       }
 
-      // Read images (1.jpg → 10.jpg)
+      // Upload header image to Cloudinary
+      const headerPath = path.join(gameDir, "header.jpg");
+      let headerImageUrl = null;
+      if (fs.existsSync(headerPath)) {
+        const result = await cloudinary.uploader.upload(headerPath, {
+          folder: `database/${name}/header`,
+        });
+        headerImageUrl = result.secure_url;
+      }
+
+      // Read images (1.jpg → 10.jpg) and upload to Cloudinary:
       const images = [];
       for (let i = 1; i <= 10; i++) {
         const imgPath = path.join(gameDir, `${i}.jpg`);
         if (fs.existsSync(imgPath)) {
           const result = await cloudinary.uploader.upload(imgPath, {
-            folder: "gamestore/images",
+            folder: `database/${name}/images`,
           });
           images.push(result.secure_url);
         }
@@ -84,6 +94,7 @@ async function importGames() {
         existingGame.link = link;
         existingGame.tags = tags;
         existingGame.images = images;
+        if (headerImageUrl) existingGame.headerImage = headerImageUrl;
         if (fs.existsSync(detailsFile)) existingGame.details = details;
         if (fs.existsSync(priceFile)) existingGame.price = price;
         await existingGame.save();
@@ -94,7 +105,7 @@ async function importGames() {
           name,
           slug: slugify(name),
           link,
-          headerImage: path.join(name, "header.jpg"),
+          headerImage: headerImageUrl || "",
           images,
           tags,
           details: details || undefined,
