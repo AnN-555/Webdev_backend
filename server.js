@@ -8,6 +8,7 @@ import gameRoutes from './routes/gameRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
+import forumRoutes from './routes/forumRoutes.js';
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ app.use('/api/games', gameRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/forums', forumRoutes);
 
 // Health check
 app.get('/', (req, res) => {
