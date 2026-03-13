@@ -26,8 +26,6 @@ const orderSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-// Index để lấy đơn theo user nhanh
 orderSchema.index({ user: 1, createdAt: -1 });
 orderSchema.index({ game: 1 });
 
